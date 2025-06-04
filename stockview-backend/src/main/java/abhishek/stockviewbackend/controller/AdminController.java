@@ -33,6 +33,12 @@ public class AdminController {
         return ResponseEntity.ok(stockService.updateStock(symbol, stockDTO));
     }
 
+    @DeleteMapping("/{symbol}")
+    public ResponseEntity<?> deleteStock(@PathVariable String symbol) {
+        stockService.deleteStock(symbol);
+        return ResponseEntity.ok("Stock deleted successfully");
+    }
+
     @GetMapping
     public ResponseEntity<List<Stock>> getAllStocks() {
         return ResponseEntity.ok(stockService.getAllStocks());
