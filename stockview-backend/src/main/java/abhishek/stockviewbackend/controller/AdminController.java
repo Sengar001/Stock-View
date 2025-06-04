@@ -26,4 +26,9 @@ public class AdminController {
         return ResponseEntity.ok(stockService.addStock(stockDTO));
     }
 
+    @GetMapping
+    public ResponseEntity<List<Stock>> getAllStocks() {
+        return ResponseEntity.ok(stockService.getAllStocks());
+    }
+
 }
