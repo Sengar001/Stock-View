@@ -26,6 +26,13 @@ public class AdminController {
         return ResponseEntity.ok(stockService.addStock(stockDTO));
     }
 
+    @PutMapping("/{symbol}")
+    public ResponseEntity<Stock> updateStock(
+            @PathVariable String symbol,
+            @Valid @RequestBody StockDTO stockDTO) {
+        return ResponseEntity.ok(stockService.updateStock(symbol, stockDTO));
+    }
+
     @GetMapping
     public ResponseEntity<List<Stock>> getAllStocks() {
         return ResponseEntity.ok(stockService.getAllStocks());
