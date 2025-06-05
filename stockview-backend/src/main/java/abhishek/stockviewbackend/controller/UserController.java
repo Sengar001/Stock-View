@@ -55,6 +55,15 @@ public class UserController {
         return ResponseEntity.ok("Removed from watchlist");
     }
 
+    @PostMapping("/alerts")
+    public ResponseEntity<?> createAlert(
+            Principal principal,
+            @Valid @RequestBody AlertRequest request) {
+        User user = getUserFromPrincipal(principal);
+        alertService.createAlert(user, request);
+        return ResponseEntity.ok("Added to alert");
+    }
+
     private User getUserFromPrincipal(Principal principal) {
         return userRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new RuntimeException("User not found"));
