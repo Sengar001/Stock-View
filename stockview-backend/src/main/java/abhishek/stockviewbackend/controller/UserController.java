@@ -46,6 +46,15 @@ public class UserController {
         return ResponseEntity.ok("Added to watchlist");
     }
 
+    @DeleteMapping("/watchlist/{symbol}")
+    public ResponseEntity<?> removeFromWatchlist(
+            Principal principal,
+            @PathVariable String symbol) {
+        User user = getUserFromPrincipal(principal);
+        watchlistService.removeFromWatchlist(user, symbol);
+        return ResponseEntity.ok("Removed from watchlist");
+    }
+
     private User getUserFromPrincipal(Principal principal) {
         return userRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new RuntimeException("User not found"));
