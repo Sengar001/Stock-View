@@ -37,6 +37,15 @@ public class UserController {
         return ResponseEntity.ok(watchlistService.getWatchlist(user));
     }
 
+    @PostMapping("/watchlist/{symbol}")
+    public ResponseEntity<?> addToWatchlist(
+            Principal principal,
+            @PathVariable String symbol) {
+        User user = getUserFromPrincipal(principal);
+        watchlistService.addToWatchlist(user, symbol);
+        return ResponseEntity.ok("Added to watchlist");
+    }
+
     private User getUserFromPrincipal(Principal principal) {
         return userRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new RuntimeException("User not found"));
