@@ -26,4 +26,11 @@ public class StockController {
     public ResponseEntity<StockData> getStockData(@PathVariable String symbol) {
         return ResponseEntity.ok(alphaVantageService.getStockQuote(symbol));
     }
+
+    @GetMapping("/{symbol}/history")
+    public ResponseEntity<List<HistoricalData>> getHistoricalData(
+            @PathVariable String symbol,
+            @RequestParam(defaultValue = "daily") String interval) {
+        return ResponseEntity.ok(alphaVantageService.getHistoricalData(symbol, interval));
+    }
 }
