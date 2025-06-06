@@ -30,6 +30,7 @@ public class SecurityConfig {
 
     private UserDetailsServiceImpl userDetailsService;
 
+    @Autowired
     private AuthEntryPointJwt unauthorizedHandler;
 
     @Bean
