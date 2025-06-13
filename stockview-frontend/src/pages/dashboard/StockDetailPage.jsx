@@ -164,14 +164,14 @@ const StockDetailPage = () => {
               <span className="text-gray-600">Previous Close</span>
               <span className="font-medium">${(stock.price - stock.change).toFixed(2)}</span>
             </div>
-            <div className="flex justify-between">
+            {/* <div className="flex justify-between">
               <span className="text-gray-600">Day Range</span>
               <span className="font-medium">${stock.low.toFixed(2)} - ${stock.high.toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between">
+            </div> */}
+            {/* <div className="flex justify-between">
               <span className="text-gray-600">Volume</span>
               <span className="font-medium">{stock.volume.toLocaleString()}</span>
-            </div>
+            </div> */}
           </div>
         </div>
         
