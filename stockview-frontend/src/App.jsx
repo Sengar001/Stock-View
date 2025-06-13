@@ -8,8 +8,8 @@ import RegisterPage from './pages/auth/RegisterPage';
 import DashboardPage from './pages/dashboard/DashboardPage';
 import StockDetailPage from './pages/dashboard/StockDetailPage';
 import WatchlistPage from './pages/dashboard/WatchlistPage';
-// import AdminPage from './pages/admin/AdminPage';
-// import NotFoundPage from './pages/NotFoundPage';
+import AdminPage from './pages/admin/AdminPage';
+import NotFoundPage from './pages/NotFoundPage';
 import PrivateRoute from './components/PrivateRoute';
 
 function App() {
@@ -28,10 +28,10 @@ function App() {
                 <Route path="/dashboard" element={<DashboardPage />} />
                 <Route path="/stock/:symbol" element={<StockDetailPage />} />
                 <Route path="/watchlist" element={<WatchlistPage />} />
-                {/* <Route path="/admin" element={<AdminPage />} /> */}
+                <Route path="/admin" element={<AdminPage />} />
               </Route>
 
-              {/* <Route path="*" element={<NotFoundPage />} /> */}
+              <Route path="*" element={<NotFoundPage />} />
             </Routes>
           </main>
           <Footer />
