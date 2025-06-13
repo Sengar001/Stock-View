@@ -5,7 +5,7 @@ import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
 import LoginPage from './pages/auth/LoginPage';
 import RegisterPage from './pages/auth/RegisterPage';
-// import DashboardPage from './pages/dashboard/DashboardPage';
+import DashboardPage from './pages/dashboard/DashboardPage';
 // import StockDetailPage from './pages/dashboard/StockDetailPage';
 // import WatchlistPage from './pages/dashboard/WatchlistPage';
 // import AdminPage from './pages/admin/AdminPage';
