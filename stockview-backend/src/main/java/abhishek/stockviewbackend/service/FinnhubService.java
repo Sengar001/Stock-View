@@ -13,23 +13,19 @@ import java.net.URI;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
-import java.util.Comparator;
-import java.util.stream.Collectors;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 @Service
-public class AlphaVantageService {
+public class FinnhubService {
 
-    @Value("${alpha.vantage.api.key}")
-    private String apiKey1;
     @Value("${finnhub.api.key}")
-    private String apiKey2;
+    private String apiKey;
 
     private final RestTemplate restTemplate;
 
-    public AlphaVantageService(RestTemplateUtil restTemplateUtil) {
+    public FinnhubService(RestTemplateUtil restTemplateUtil) {
         this.restTemplate = restTemplateUtil.getRestTemplate();
     }
 
@@ -38,7 +34,7 @@ public class AlphaVantageService {
 
         URI uri = UriComponentsBuilder.fromHttpUrl(url)
                 .queryParam("symbol", symbol)
-                .queryParam("token", apiKey2)
+                .queryParam("token", apiKey)
                 .build()
                 .toUri();
 
@@ -63,56 +59,46 @@ public class AlphaVantageService {
 
     @Cacheable(value = "stockHistory", key = "{#symbol, #interval}")
     public List<HistoricalData> getHistoricalData(String symbol, String interval) {
-        String function = getFunctionForInterval(interval);
-        String responseKey = getResponseKeyForFunction(function);
-        String url = "https://www.alphavantage.co/query";
+        String resolution = getResolution(interval);
+
+        long now = Instant.now().getEpochSecond();
+        long from = LocalDate.now().minusDays(100).atStartOfDay().toEpochSecond(ZoneOffset.UTC);  // ~100 days back
+
+        String url = "https://finnhub.io/api/v1/stock/candle";
 
         URI uri = UriComponentsBuilder.fromHttpUrl(url)
-                .queryParam("function", function)
                 .queryParam("symbol", symbol)
-                .queryParam("apikey", apiKey1)
+                .queryParam("resolution", resolution)
+                .queryParam("from", from)
+                .queryParam("to", now)
+                .queryParam("token", apiKey)
                 .build()
                 .toUri();
 
-        Map<String, Object> response = restTemplate.getForObject(uri, Map.class);
+        var response = restTemplate.getForObject(uri, Map.class);
 
-        // Handle API limitations
-        if (response == null || response.containsKey("Note") || response.containsKey("Error Message")) {
-            throw new RuntimeException("API error: " + response.getOrDefault("Note", "Invalid response"));
-        }
-
-        // Get the correct time series key
-        Map<String, Map<String, String>> timeSeries = (Map<String, Map<String, String>>) response.get(responseKey);
-
-        if (timeSeries == null) {
+        if (response == null || !"ok".equalsIgnoreCase((String) response.get("s"))) {
             throw new RuntimeException("No historical data found for " + symbol);
         }
 
         List<HistoricalData> data = new ArrayList<>();
-        timeSeries.forEach((date, values) -> {
-            String closePrice = values.get("4. close");
-            data.add(new HistoricalData(date, Double.parseDouble(closePrice)));
-        });
+        List<Long> timestamps = (List<Long>) response.get("t");
+        List<Double> closes = (List<Double>) response.get("c");
 
-        return data.stream()
-                .sorted(Comparator.comparing(HistoricalData::date))
-                .collect(Collectors.toList());
+        for (int i = 0; i < timestamps.size(); i++) {
+            String date = Instant.ofEpochSecond(timestamps.get(i)).atZone(ZoneOffset.UTC).toLocalDate().toString();
+            data.add(new HistoricalData(date, closes.get(i)));
+        }
+
+        return data;
     }
 
-    private String getFunctionForInterval(String interval) {
+    private String getResolution(String interval) {
         return switch (interval.toLowerCase()) {
-            case "weekly" -> "TIME_SERIES_WEEKLY";
-            case "monthly" -> "TIME_SERIES_MONTHLY";
-            default -> "TIME_SERIES_DAILY";  // Daily is default
-        };
-    }
-
-    // Maps API function to actual response key
-    private String getResponseKeyForFunction(String function) {
-        return switch (function) {
-            case "TIME_SERIES_WEEKLY" -> "Weekly Time Series";
-            case "TIME_SERIES_MONTHLY" -> "Monthly Time Series";
-            default -> "Time Series (Daily)";  // Daily is default
+            case "weekly" -> "W";
+            case "monthly" -> "M";
+            default -> "D"; // Daily is default
         };
     }
 }
+

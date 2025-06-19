@@ -14,4 +14,5 @@ public record StockDTO(
         @Size(min = 2, max = 100, message = "Name must be 2-100 characters")
         @JsonProperty("name")
         String name
+
 ) {}

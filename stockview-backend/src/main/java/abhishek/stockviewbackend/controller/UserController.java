@@ -1,6 +1,7 @@
 package abhishek.stockviewbackend.controller;
 
 import abhishek.stockviewbackend.dto.AlertRequest;
+import abhishek.stockviewbackend.dto.StockData;
 import abhishek.stockviewbackend.entity.Stock;
 import abhishek.stockviewbackend.entity.Alert;
 import abhishek.stockviewbackend.entity.User;
@@ -32,7 +33,7 @@ public class UserController {
     }
 
     @GetMapping("/watchlist")
-    public ResponseEntity<List<Stock>> getWatchlist(Principal principal) {
+    public ResponseEntity<List<StockData>> getWatchlist(Principal principal) {
         User user = getUserFromPrincipal(principal);
         return ResponseEntity.ok(watchlistService.getWatchlist(user));
     }

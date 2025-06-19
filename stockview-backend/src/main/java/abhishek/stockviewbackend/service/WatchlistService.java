@@ -1,5 +1,6 @@
 package abhishek.stockviewbackend.service;
 
+import abhishek.stockviewbackend.dto.StockData;
 import abhishek.stockviewbackend.entity.Stock;
 import abhishek.stockviewbackend.entity.User;
 import abhishek.stockviewbackend.entity.Watchlist;
@@ -19,6 +20,7 @@ public class WatchlistService {
 
     private final WatchlistRepository watchlistRepository;
     private final StockRepository stockRepository;
+    private final AlphaVantageService alphaVantageService;
 
     @Transactional
     public void addToWatchlist(User user, String symbol) {
@@ -45,10 +47,18 @@ public class WatchlistService {
     }
 
     @Transactional(readOnly = true)
-    public List<Stock> getWatchlist(User user) {
+    public List<StockData> getWatchlist(User user) {
         List<Watchlist> watchlistItems = watchlistRepository.findByUser(user);
-        return watchlistItems.stream()
-                .map(Watchlist::getStock)
-                .collect(Collectors.toList());
+        return watchlistItems.stream().map(item -> {
+            Stock stock = item.getStock();
+            StockData quote = alphaVantageService.getStockQuote(stock.getSymbol());
+
+            return new StockData(
+                    stock.getSymbol(),
+                    quote.price(),
+                    quote.change(),
+                    quote.changePercent()
+            );
+        }).collect(Collectors.toList());
     }
 }
